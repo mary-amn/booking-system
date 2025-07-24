@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 
 @Module({
-  controllers: [],
+  controllers: []
 })
-export class BookingModule {}
+export class ResourceModule {}
