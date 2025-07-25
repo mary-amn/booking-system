@@ -33,7 +33,7 @@ export class UserRepository {
     await this.repo.save(orm);
   }
 
-  async findById(id: string): Promise<User | null> {
+  async findById(id: number): Promise<User | null> {
     const orm = await this.repo.findOne({ where: { id } });
     return orm ? this.toDomain(orm) : null;
   }

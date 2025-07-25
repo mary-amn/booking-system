@@ -31,7 +31,7 @@ export class ResourceRepository {
     await this.repo.save(orm);
   }
 
-  async findById(id: string): Promise<Resource> {
+  async findById(id: number): Promise<Resource> {
     const orm = await this.repo.findOne({ where: { id } });
     if (!orm) throw new NotFoundException(`Resource ${id} not found`);
     return this.toDomain(orm);

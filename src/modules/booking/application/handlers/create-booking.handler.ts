@@ -13,7 +13,7 @@ export class CreateBookingHandler
 {
   constructor(private readonly bookingRepo: BookingRepository) {}
 
-  async execute(cmd: CreateBookingCommand): Promise<string> {
+  async execute(cmd: CreateBookingCommand): Promise<number> {
     const slot = TimeSlot.create(cmd.startsAt, cmd.endsAt);
     const conflicts = await this.bookingRepo.findOverlaps(cmd.resourceId, slot);
     if (conflicts.length > 0) {

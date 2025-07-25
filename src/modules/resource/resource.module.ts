@@ -3,14 +3,14 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ResourceRepository } from './infrastraucture/repositories/resource.repository';
 import { ResourceOrmEntity } from './infrastraucture/persistence/resource-orm.entity';
-import { ListAvailabilityHandler } from './application/handlers/list-availability.handler';
 import { CqrsModule } from '@nestjs/cqrs';
+import { ResourceController } from './interface/rest/resource.controller';
 // ...
 
-const queryHandlers = [ListAvailabilityHandler];
 @Module({
   imports: [TypeOrmModule.forFeature([ResourceOrmEntity]), CqrsModule],
-  providers: [ResourceRepository,...queryHandlers],
+  providers: [ResourceRepository],
   exports: [ResourceRepository],
+  controllers: [ResourceController],
 })
-export class SchedulingModule {}
+export class ResourceModule {}

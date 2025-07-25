@@ -4,7 +4,8 @@ import {
   PrimaryGeneratedColumn,
   Index,
   CreateDateColumn,
-  UpdateDateColumn, DeleteDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 import { BookingStatus } from '../booking-status.enum';
 
@@ -12,12 +13,12 @@ import { BookingStatus } from '../booking-status.enum';
 @Index(['resourceId', 'startsAt', 'endsAt'])
 export class BookingOrmEntity {
   @PrimaryGeneratedColumn('increment', { type: 'bigint', unsigned: true })
-  id: string;
+  id: number;
 
-  @Column('uuid')
-  resourceId: string;
-  @Column('uuid')
-  userId: string;
+  @Column('bigint')
+  resourceId: number;
+  @Column('bigint')
+  userId: number;
 
   @Column('timestamp')
   startsAt: Date;

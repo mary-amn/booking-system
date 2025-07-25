@@ -1,6 +1,7 @@
 import {
   Column,
-  CreateDateColumn, DeleteDateColumn,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   PrimaryGeneratedColumn,
   Unique,
@@ -11,7 +12,7 @@ import {
 @Unique(['email'])
 export class UserOrmEntity {
   @PrimaryGeneratedColumn('increment', { type: 'bigint', unsigned: true })
-  id: string;
+  id: number;
 
   @Column({ type: 'varchar', length: 191 })
   email: string;

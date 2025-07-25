@@ -1,9 +1,9 @@
 import { BookingStatus } from '../../infrastraucture/booking-status.enum';
 
 export class Booking {
-  id: string;
-  resourceId: string;
-  userId: string;
+  id: number;
+  resourceId: number;
+  userId: number;
   startsAt: Date;
   endsAt: Date;
   status: BookingStatus;
@@ -20,14 +20,13 @@ export class Booking {
 
   /** Factory: default status to PENDING if not provided */
   static create(
-    resourceId: string,
-    userId: string,
+    resourceId: number,
+    userId: number,
     startsAt: Date,
     endsAt: Date,
     status: BookingStatus = BookingStatus.PENDING,
   ): Booking {
     return new Booking({
-      id: crypto.randomUUID(), // or pass in an ID generator
       resourceId,
       userId,
       startsAt,

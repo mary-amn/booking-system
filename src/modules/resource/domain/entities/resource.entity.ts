@@ -1,5 +1,5 @@
 export class Resource {
-  id: string;
+  id: number;
   name: string;
   capacity: number; // >1 means parallel bookings allowed
   timezone: string;

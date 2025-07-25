@@ -1,6 +1,7 @@
 import {
   Column,
-  CreateDateColumn, DeleteDateColumn,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -9,7 +10,7 @@ import {
 @Entity('resources')
 export class ResourceOrmEntity {
   @PrimaryGeneratedColumn('increment', { type: 'bigint', unsigned: true })
-  id: string;
+  id: number;
   @Column('text')
   name: string;
   @Column('int', { default: 1 })

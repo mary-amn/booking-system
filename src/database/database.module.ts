@@ -1,6 +1,9 @@
 import { Global, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { BookingOrmEntity } from '../modules/booking/infrastraucture/persistence/booking-orm.entity';
+import { UserOrmEntity } from '../modules/user/infrastraucture/persistence/user-orm.entity';
+import { ResourceOrmEntity } from '../modules/resource/infrastraucture/persistence/resource-orm.entity';
 
 @Global() // so you don't need to import it everywhere
 @Module({
@@ -18,6 +21,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         autoLoadEntities: false,
         migrations: ['dist/migrations/*.js'],
         synchronize: false, // true only for quick demos, off in prod
+        entities:[BookingOrmEntity, UserOrmEntity, ResourceOrmEntity],
       }),
     }),
   ],

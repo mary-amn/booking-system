@@ -11,7 +11,7 @@ module.exports = new typeorm.DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  entities: ['dist/**/**.entity{.ts,.js}'],
+  entities: ['dist/**/**orm.entity{.ts,.js}'],
   migrations: ['dist/**/**.migration{.ts,.js}'],
   synchronize: false,
 });

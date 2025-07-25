@@ -7,15 +7,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BookingOrmEntity } from './infrastraucture/persistence/booking-orm.entity';
 import { CqrsModule } from '@nestjs/cqrs';
 import { BookingRepository } from './infrastraucture/repositories/booking.repository';
+import { BookingController } from './interface/rest/booking.controller';
+import { ListAvailabilityHandler } from './application/handlers/list-availability.handler';
 const commandHandlers = [
   CreateBookingHandler,
   ConfirmBookingHandler,
   CancelBookingHandler,
 ];
-const queryHandlers = [GetBookingHandler];
+const queryHandlers = [GetBookingHandler,ListAvailabilityHandler];
 @Module({
   imports: [TypeOrmModule.forFeature([BookingOrmEntity]), CqrsModule],
-  controllers: [],
+  controllers: [BookingController],
   providers: [
     // infra
     BookingRepository,

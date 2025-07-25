@@ -6,14 +6,28 @@ import { BookingOrmEntity } from '../persistence/booking-orm.entity';
 import { BookingStatus } from '../booking-status.enum';
 import { TimeSlot } from '../../domain/value-objects/timeSlot.vo';
 
-
 @Injectable()
 export class BookingRepository {
   constructor(
     @InjectRepository(BookingOrmEntity)
     private readonly repo: Repository<BookingOrmEntity>,
   ) {}
+
   private toDomain(orm: BookingOrmEntity): Booking {
+    const booking = new Booking({
+      id: orm.id,
+      userId: orm.userId,
+      resourceId: orm.resourceId,
+      startsAt: orm.startsAt,
+      endsAt: orm.endsAt,
+      status: orm.status,
+      createdAt: orm.createdAt,
+      updatedAt: orm.updatedAt,
+    });
+    return booking;
+  }
+
+  private create(orm: BookingOrmEntity): Booking {
     return Booking.create(
       orm.resourceId,
       orm.userId,
@@ -36,23 +50,24 @@ export class BookingRepository {
     orm.updatedAt = domain.updatedAt;
     return orm;
   }
+
   async save(booking: Booking): Promise<void> {
     const orm = this.toOrmEntity(booking);
     await this.repo.save(orm);
   }
 
-  async findById(id: string): Promise<Booking | null> {
+  async findById(id: number): Promise<Booking | null> {
     const orm = await this.repo.findOne({ where: { id } });
     return orm ? this.toDomain(orm) : null;
   }
 
-  async findByUser(userId: string): Promise<Booking[]> {
+  async findByUser(userId: number): Promise<Booking[]> {
     const rows = await this.repo.find({ where: { userId } });
     return rows.map((x) => this.toDomain(x));
   }
 
   async findByResource(
-    resourceId: string,
+    resourceId: number,
     from: Date,
     to: Date,
   ): Promise<Booking[]> {
@@ -66,7 +81,7 @@ export class BookingRepository {
   }
 
   async findOverlaps(
-    resourceId: string,
+    resourceId: number,
     slot: TimeSlot,
     ignoreBookingId?: string,
   ): Promise<Booking[]> {

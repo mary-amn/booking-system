@@ -1,3 +1,3 @@
 export class CancelBookingCommand {
-  constructor(public readonly bookingId: string) {}
+  constructor(public readonly bookingId: number) {}
 }
