@@ -3,9 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Resource } from '../../domain/entities/resource.entity';
 import { ResourceOrmEntity } from '../persistence/resource-orm.entity';
+import { IResourceRepository } from '../../domain/repositories/resource.repository.interface';
 
 @Injectable()
-export class ResourceRepository {
+export class ResourceRepository implements IResourceRepository{
   constructor(
     @InjectRepository(ResourceOrmEntity)
     private readonly repo: Repository<ResourceOrmEntity>,

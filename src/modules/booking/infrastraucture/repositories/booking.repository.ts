@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
+import { Repository, Between, LessThanOrEqual, MoreThan } from 'typeorm';
 import { Booking } from '../../domain/entities/booking.entity';
 import { BookingOrmEntity } from '../persistence/booking-orm.entity';
 import { BookingStatus } from '../booking-status.enum';
 import { TimeSlot } from '../../domain/value-objects/timeSlot.vo';
+import { IBookingRepository } from '../../domain/repositories/booking-repository.interface';
 
 @Injectable()
-export class BookingRepository {
+export class BookingRepository implements IBookingRepository {
   constructor(
     @InjectRepository(BookingOrmEntity)
     private readonly repo: Repository<BookingOrmEntity>,
@@ -100,5 +101,21 @@ export class BookingRepository {
     }
     const rows = await qb.getMany();
     return rows.map((x) => this.toDomain(x));
+  }
+
+  async findOverlappingBookings(
+    startTime: Date,
+    endTime: Date,
+  ): Promise<Booking[]> {
+    const overlapping = await this.repo.find({
+      where: {
+        startsAt: LessThanOrEqual(endTime),
+        endsAt: MoreThan(startTime),
+        status: BookingStatus.CONFIRMED,
+      },
+    });
+
+    // Map database result to domain entities
+    return overlapping.map((b) => this.toDomain(b));
   }
 }
