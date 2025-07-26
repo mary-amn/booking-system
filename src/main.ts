@@ -2,12 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { AllExceptionsFilter } from './shared/infrastructure/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   // Validation
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-
+  app.useGlobalFilters(new AllExceptionsFilter());
   // Swagger setup
   const config = new DocumentBuilder()
     .setTitle('Booking API')

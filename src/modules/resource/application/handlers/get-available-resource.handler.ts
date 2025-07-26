@@ -23,8 +23,8 @@ export class GetAvailableResourcesHandler
       await this.bookingRepository.findOverlappingBookings(startTime, endTime);
 
     // 2. Get the IDs of the resources that are already booked.
-    const unavailableResourceIds = new Set(
-      overlappingBookings.map((booking) => booking.resourceId),
+    const unavailableResourceIds = overlappingBookings.map(
+      (booking) => booking.resourceId,
     );
 
     // 3. Get all resources.
@@ -32,7 +32,7 @@ export class GetAvailableResourcesHandler
 
     // 4. Filter out the unavailable resources.
     const availableResources = allResources.filter(
-      (resource) => !unavailableResourceIds.has(resource.id),
+      (resource) => !unavailableResourceIds.find((x) => x === resource.id),
     );
 
     return availableResources;

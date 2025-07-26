@@ -1,4 +1,3 @@
-import { Email } from '../value-object/email.vo';
 
 export class User {
   id: number;
@@ -19,16 +18,6 @@ export class User {
     });
   }
 
-  changeName(name: string) {
-    if (!name.trim()) throw new Error('Name cannot be empty');
-    this.name = name;
-    this.touch();
-  }
-
-  changeEmail(email: Email) {
-    this.email = email.value;
-    this.touch();
-  }
 
   private touch() {
     this.updatedAt = new Date();

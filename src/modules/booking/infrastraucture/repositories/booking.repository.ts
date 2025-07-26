@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between, LessThanOrEqual, MoreThan } from 'typeorm';
+import {
+  Repository,
+  Between,
+  LessThanOrEqual,
+  MoreThan,
+  EntityManager,
+} from 'typeorm';
 import { Booking } from '../../domain/entities/booking.entity';
 import { BookingOrmEntity } from '../persistence/booking-orm.entity';
 import { BookingStatus } from '../booking-status.enum';
@@ -24,6 +30,7 @@ export class BookingRepository implements IBookingRepository {
       status: orm.status,
       createdAt: orm.createdAt,
       updatedAt: orm.updatedAt,
+      deleted_at: orm.deleted_at,
     });
     return booking;
   }
@@ -117,5 +124,33 @@ export class BookingRepository implements IBookingRepository {
 
     // Map database result to domain entities
     return overlapping.map((b) => this.toDomain(b));
+  }
+
+  async findConflictingBookingsWithLock(
+    resourceId: number,
+    startTime: Date,
+    endTime: Date,
+    manager: EntityManager, // Use the provided manager for transaction
+  ): Promise<Booking[]> {
+    // Use the provided manager to create the query, NOT this.repo
+    const conflictingBookings = await manager
+      .createQueryBuilder(BookingOrmEntity, 'booking') // Pass the entity as the first argument
+      .where('booking.resourceId = :resourceId', {
+        resourceId: resourceId,
+      })
+      .andWhere('booking.status NOT IN (:...excludedStatuses)', {
+        excludedStatuses: [BookingStatus.CANCELLED],
+      })
+      .andWhere(
+        `(booking.startsAt <= :endDate AND booking.endsAt > :startDate)`,
+        {
+          startDate: startTime,
+          endDate: endTime,
+        },
+      )
+      .setLock('pessimistic_write') // Now this lock is part of the transaction
+      .getMany();
+
+    return conflictingBookings.map((item) => this.toDomain(item));
   }
 }

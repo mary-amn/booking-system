@@ -11,7 +11,11 @@ export class CancelBookingHandler
 
   async execute(cmd: CancelBookingCommand): Promise<void> {
     const booking = await this.bookingRepo.findById(cmd.bookingId);
-    if (!booking) throw new NotFoundException('Booking not found');
+    if (!booking) {
+      throw new NotFoundException(
+        'Booking not found with ID: ' + cmd.bookingId,
+      );
+    }
     booking.cancel();
     await this.bookingRepo.save(booking);
   }
