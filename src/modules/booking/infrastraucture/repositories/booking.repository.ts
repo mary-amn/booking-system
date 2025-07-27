@@ -1,13 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
+import {
+  Repository,
+  Between,
+  LessThanOrEqual,
+  MoreThan,
+  EntityManager,
+} from 'typeorm';
 import { Booking } from '../../domain/entities/booking.entity';
 import { BookingOrmEntity } from '../persistence/booking-orm.entity';
 import { BookingStatus } from '../booking-status.enum';
 import { TimeSlot } from '../../domain/value-objects/timeSlot.vo';
+import { IBookingRepository } from '../../domain/repositories/booking-repository.interface';
 
 @Injectable()
-export class BookingRepository {
+export class BookingRepository implements IBookingRepository {
   constructor(
     @InjectRepository(BookingOrmEntity)
     private readonly repo: Repository<BookingOrmEntity>,
@@ -23,6 +30,7 @@ export class BookingRepository {
       status: orm.status,
       createdAt: orm.createdAt,
       updatedAt: orm.updatedAt,
+      deleted_at: orm.deleted_at,
     });
     return booking;
   }
@@ -100,5 +108,49 @@ export class BookingRepository {
     }
     const rows = await qb.getMany();
     return rows.map((x) => this.toDomain(x));
+  }
+
+  async findOverlappingBookings(
+    startTime: Date,
+    endTime: Date,
+  ): Promise<Booking[]> {
+    const overlapping = await this.repo.find({
+      where: {
+        startsAt: LessThanOrEqual(endTime),
+        endsAt: MoreThan(startTime),
+        status: BookingStatus.CONFIRMED,
+      },
+    });
+
+    // Map database result to domain entities
+    return overlapping.map((b) => this.toDomain(b));
+  }
+
+  async findConflictingBookingsWithLock(
+    resourceId: number,
+    startTime: Date,
+    endTime: Date,
+    manager: EntityManager, // Use the provided manager for transaction
+  ): Promise<Booking[]> {
+    // Use the provided manager to create the query, NOT this.repo
+    const conflictingBookings = await manager
+      .createQueryBuilder(BookingOrmEntity, 'booking') // Pass the entity as the first argument
+      .where('booking.resourceId = :resourceId', {
+        resourceId: resourceId,
+      })
+      .andWhere('booking.status NOT IN (:...excludedStatuses)', {
+        excludedStatuses: [BookingStatus.CANCELLED],
+      })
+      .andWhere(
+        `(booking.startsAt <= :endDate AND booking.endsAt > :startDate)`,
+        {
+          startDate: startTime,
+          endDate: endTime,
+        },
+      )
+      .setLock('pessimistic_write') // Now this lock is part of the transaction
+      .getMany();
+
+    return conflictingBookings.map((item) => this.toDomain(item));
   }
 }

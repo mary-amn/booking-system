@@ -14,16 +14,28 @@ const commandHandlers = [
   ConfirmBookingHandler,
   CancelBookingHandler,
 ];
+
+
 const queryHandlers = [GetBookingHandler,ListAvailabilityHandler];
+
+const bookingRepositoryProvider = {
+  provide: 'IBookingRepository', // Use a string token or the interface
+  useClass: BookingRepository,
+};
 @Module({
   imports: [TypeOrmModule.forFeature([BookingOrmEntity]), CqrsModule],
   controllers: [BookingController],
   providers: [
     // infra
     BookingRepository,
+    {
+      provide: 'IBookingRepository', // Use a string token or the interface
+      useClass: BookingRepository,
+    },
     // CQRS
     ...commandHandlers,
     ...queryHandlers,
   ],
+  exports:['IBookingRepository']
 })
 export class BookingModule {}

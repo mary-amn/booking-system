@@ -1,11 +1,11 @@
-// src/modules/scheduling/interfaces/rest/resource.controller.ts
 import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 
 import { Resource } from '../../domain/entities/resource.entity';
 import { ResourceRepository } from '../../infrastraucture/repositories/resource.repository';
 import { CreateResourceDto } from '../dto/create-resource.dto';
-import { ListAvailabilityQuery } from '../../../booking/application/queries/list-availability.query';
 import { QueryBus } from '@nestjs/cqrs';
+import { GetAvailableResourcesQuery } from '../../application/queries/get-available-resource.query';
+import { GetAvailableResourcesDto } from '../get-available-resources.dto';
 
 @Controller('resources')
 export class ResourceController {
@@ -23,6 +23,19 @@ export class ResourceController {
     return { id };
   }
 
+
+  @Get('available')
+  async findAvailable(
+    @Query() queryDto: GetAvailableResourcesDto,
+  ): Promise<Resource[]> {
+    return this.queryBus.execute(
+      new GetAvailableResourcesQuery(
+        new Date(queryDto.startTime),
+        new Date(queryDto.endTime),
+      ),
+    );
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.repo.findById(Number(id));
@@ -32,5 +45,6 @@ export class ResourceController {
   async findAll() {
     return await this.repo.listAll();
   }
+
 
 }

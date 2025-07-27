@@ -1,4 +1,3 @@
-// src/modules/scheduling/application/handlers/get-booking.handler.ts
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetBookingQuery } from '../queries/get-booking.query';
 import { NotFoundException } from '@nestjs/common';
@@ -10,7 +9,11 @@ export class GetBookingHandler implements IQueryHandler<GetBookingQuery> {
 
   async execute(query: GetBookingQuery) {
     const booking = await this.bookingRepo.findById(query.bookingId);
-    if (!booking) throw new NotFoundException('Booking not found');
+    if (!booking) {
+      throw new NotFoundException(
+        'Booking not found with ID: ' + query.bookingId,
+      );
+    }
     return {
       id: booking.id,
       userId: booking.userId,
