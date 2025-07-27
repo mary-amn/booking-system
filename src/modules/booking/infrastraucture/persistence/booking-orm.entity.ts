@@ -20,9 +20,9 @@ export class BookingOrmEntity {
   @Column('bigint')
   userId: number;
 
-  @Column('timestamp')
+  @Column('datetime')
   startsAt: Date;
-  @Column('timestamp')
+  @Column('datetime')
   endsAt: Date;
 
   @Column({
