@@ -1,23 +1,23 @@
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
-import { BookingConfirmedEvent } from '../impl/booking-confirmed.event';
-import { BookingStatus } from '../../../infrastraucture/booking-status.enum';
+import { BookingHistoryEvent } from '../impl/booking-history.event';
 import { IBookingHistoryRepository } from '../../../domain/repositories/booking-history-repository.interface';
 import { Inject } from '@nestjs/common';
 import { BookingHistory } from '../../../domain/entities/booking-history.entity';
 
-@EventsHandler(BookingConfirmedEvent)
+@EventsHandler(BookingHistoryEvent)
 export class BookingHistoryHandler
-  implements IEventHandler<BookingConfirmedEvent>
+  implements IEventHandler<BookingHistoryEvent>
 {
   constructor(
     @Inject('IBookingHistoryRepository') // Inject your new repository
     private readonly historyRepository: IBookingHistoryRepository,
   ) {}
 
-  async handle(event: BookingConfirmedEvent) {
+  async handle(event: BookingHistoryEvent) {
+
     const bookingHistory = BookingHistory.create(
       event.bookingId,
-      BookingStatus.CONFIRMED,
+      event.eventType,
       new Date(),
       {
         resourceId: event.resourceId,

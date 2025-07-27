@@ -58,9 +58,10 @@ export class BookingRepository implements IBookingRepository {
     return orm;
   }
 
-  async save(booking: Booking): Promise<void> {
+  async save(booking: Booking): Promise<number> {
     const orm = this.toOrmEntity(booking);
     await this.repo.save(orm);
+    return orm.id;
   }
 
   async findById(id: number): Promise<Booking | null> {

@@ -1,10 +1,10 @@
-// src/modules/scheduling/application/handlers/confirm-booking.handler.ts
-import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
+import {CommandHandler, EventBus, ICommandHandler} from '@nestjs/cqrs';
 
-import { NotFoundException } from '@nestjs/common';
-import { ConfirmBookingCommand } from '../commands/confirm-booking.command';
-import { BookingRepository } from '../../infrastraucture/repositories/booking.repository';
-import { BookingConfirmedEvent } from '../events/impl/booking-confirmed.event';
+import {NotFoundException} from '@nestjs/common';
+import {ConfirmBookingCommand} from '../commands/confirm-booking.command';
+import {BookingRepository} from '../../infrastraucture/repositories/booking.repository';
+import {BookingHistoryEvent} from '../events/impl/booking-history.event';
+import {BookingStatus} from "../../infrastraucture/booking-status.enum";
 
 @CommandHandler(ConfirmBookingCommand)
 export class ConfirmBookingHandler
@@ -20,7 +20,7 @@ export class ConfirmBookingHandler
     if (!booking) throw new NotFoundException('Booking not found');
     booking.confirm();
     this.eventBus.publish(
-      new BookingConfirmedEvent(booking.id, booking.resourceId, booking.userId),
+      new BookingHistoryEvent(booking.id, booking.resourceId, booking.userId,BookingStatus.CONFIRMED),
     );
     await this.bookingRepo.save(booking);
   }

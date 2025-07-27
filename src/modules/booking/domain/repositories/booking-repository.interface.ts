@@ -15,7 +15,7 @@ export interface BookingReader {
 }
 
 export interface BookingWriter {
-  save(booking: Booking): Promise<void>;
+  save(booking: Booking): Promise<number>;
 }
 
 export interface IBookingRepository extends BookingReader, BookingWriter {}
