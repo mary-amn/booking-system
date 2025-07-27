@@ -1,98 +1,209 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Booking System API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This project is a robust RESTful API for a booking and reservation system, built with NestJs. It follows modern software architecture principles, including Domain-Driven Design (DDD) and Command Query Responsibility Segregation (CQRS), to ensure a scalable, maintainable, and testable codebase.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## ✨ Features
 
-## Description
+*   **Booking Management**: Create, confirm, cancel, and retrieve bookings.
+*   **Resource Availability**: Check for available resources within a given time slot.
+*   **CQRS Architecture**: Separates read and write operations for improved performance and scalability.
+*   **Domain-Driven Design**: Models the business domain accurately with entities, value objects, and repositories.
+*   **Type-Safe Database**: Uses TypeORM for reliable and type-safe database interactions.
+*   **API Documentation**: Automatically generated and interactive API documentation with Swagger (OpenAPI).
+*   **Validation**: Built-in request data validation using `class-validator`.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 🛠️ Tech Stack
 
-## Project setup
+*   **Framework**: [NestJS](https://nestjs.com/)
+*   **Language**: [TypeScript](https://www.typescriptlang.org/)
+*   **Architecture**: DDD, CQRS (`@nestjs/cqrs`)
+*   **ORM**: [TypeORM](https://typeorm.io/)
+*   **API Specification**: Swagger (`@nestjs/swagger`)
+*   **Testing**: [Jest](https://jestjs.io/), [Supertest](https://github.com/visionmedia/supertest)
 
-```bash
-$ npm install
+## 🚀 Getting Started
+
+### Prerequisites
+
+*   [Node.js](https://nodejs.org/en/) (v18 or higher recommended)
+*   [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
+*   A running instance of a database (e.g., PostgreSQL, MySQL).
+
+### Installation
+
+1.  **Clone the repository:**
+    ```bash
+    git clone <your-repository-url>
+    cd <repository-directory>
+    ```
+
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+
+3.  **Set up environment variables:**
+    Create a `.env` file in the root directory by copying the example file:
+    ```bash
+    cp .env.example .env
+    ```
+    Update the `.env` file with your database credentials and other environment-specific configurations.
+
+    ```env
+    # .env
+    DB_HOST=localhost
+    DB_PORT=5432
+    DB_USERNAME=user
+    DB_PASSWORD=password
+    DB_DATABASE=booking_db
+    ```
+
+### Running the Application
+
+*   **Development mode:**
+    ```bash
+    npm run start:dev
+    ```
+    The application will start with hot-reloading enabled.
+
+*   **Production mode:**
+    ```bash
+    npm run build
+    npm run start:prod
+    ```
+
+The server will be running on `http://localhost:3000` by default.
+
+### Running Tests
+
+*   **Run all unit and intigration tests:**
+    ```bash
+    npm test
+    ```
+
+
+*   **Run tests with coverage:**
+    ```bash
+    npm run test:cov
+    ```
+
+## 📖 API Documentation
+
+Once the application is running, you can access the interactive Swagger UI for API documentation and testing at:
+
+`http://localhost:3000/docs`
+
+## 🏗️ Project Structure
+
+The project follows a modular structure inspired by Domain-Driven Design. Each business domain (e.g., `booking`, `user`) is a separate module.
+
+```
+src
+├── modules/
+│   ├── booking/
+│   │   ├── application/    # Use cases (Commands, Queries, Handlers)
+│   │   ├── domain/         # Core business logic (Entities, Repositories, Value Objects)
+│   │   ├── infrastructure/ # Implementations (DB, external services)
+│   │   └── interface/      # API layer (Controllers, DTOs)
+│   └── ...               # Other modules (e.g., user, resource)
+├── shared/                 # Shared utilities and modules
+└── main.ts                 # Application entry point
 ```
 
-## Compile and run the project
 
-```bash
-# development
-$ npm run start
+## 📖 API Model
 
-# watch mode
-$ npm run start:dev
+The API provides RESTful endpoints for managing bookings.
 
-# production mode
-$ npm run start:prod
-```
+### Main Endpoints
 
-## Run tests
+*   **`POST /bookings`**
+    *   Creates a new booking.
+    *   **Request Body:**
+        ```json
+        {
+          "userId": "string",
+          "resourceId": "string",
+          "startsAt": "ISO8601DateString",
+          "endsAt": "ISO8601DateString"
+        }
+        ```
+    *   **Success Response (201 Created):**
+        ```json
+        {
+          "id": "string"
+        }
+        ```
 
-```bash
-# unit tests
-$ npm run test
+*   **`GET /bookings/:id`**
+    *   Retrieves a specific booking by its ID.
+    *   **Success Response (200 OK):**
+        ```json
+        {
+          "id": "string",
+          "userId": "string",
+          "resourceId": "string",
+          "startsAt": "ISO8601DateString",
+          "endsAt": "ISO8601DateString",
+          "status": "CONFIRMED" | "PENDING" | "CANCELLED"
+        }
+        ```
 
-# e2e tests
-$ npm run test:e2e
+*   **`PATCH /bookings/:id/confirm`**
+    *   Confirms a pending booking.
+    *   **Success Response (200 OK):**
+        ```json
+        {
+          "id": "string",
+          "status": "CONFIRMED"
+        }
+        ```
 
-# test coverage
-$ npm run test:cov
-```
+*   **`DELETE /bookings/:id`**
+    *   Cancels a booking.
+    *   **Success Response (200 OK):**
+        ```json
+        {
+          "id": "string",
+          "status": "CANCELLED"
+        }
+        ```
 
-## Deployment
+*   **`GET /resources/available`**
+    *   Finds available resources for a given time slot.
+    *   **Query Parameters:** `startTime`, `endTime`
+    *   **Success Response (200 OK):**
+        ```json
+        [
+          {
+            "id": "string",
+            "name": "string"
+          }
+        ]
+        ```
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## 📊 Data Model
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+The core of the data model is the `Booking` entity, which is managed by TypeORM.
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+### `Booking` Entity
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+This entity represents a reservation in the system.
 
-## Resources
+| Column       | Type      | Description                                  |
+| :----------- | :-------- | :------------------------------------------- |
+| `id`         | `number`  | Primary Key (bigint)                           |
+| `userId`     | `number`  | Foreign key to the `User` entity.            |
+| `resourceId` | `number`  | Foreign key to the `Resource` entity.        |
+| `startsAt`   | `Date`    | The start date and time of the booking.      |
+| `endsAt`     | `Date`    | The end date and time of the booking.        |
+| `status`     | `enum`    | The current status (`PENDING`, `CONFIRMED`). |
+| `createdAt`  | `Date`    | Timestamp of when the record was created.    |
+| `updatedAt`  | `Date`    | Timestamp of the last update.                |
 
-Check out a few resources that may come in handy when working with NestJS:
+### Relationships
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+*   A **Booking** belongs to one **User**.
+*   A **Booking** belongs to one **Resource**.
+*   A **User** can have many **Bookings**.
+*   A **Resource** can have many **Bookings**.
