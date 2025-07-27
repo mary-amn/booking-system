@@ -7,7 +7,7 @@ import {
 import { BookingStatus } from '../booking-status.enum';
 
 @Entity('booking_history')
-export class BookingHistory {
+export class BookingHistoryOrmEntity {
   @PrimaryGeneratedColumn('uuid')
   id: number;
 

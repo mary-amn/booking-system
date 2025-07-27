@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BookingOrmEntity } from '../modules/booking/infrastraucture/persistence/booking-orm.entity';
 import { UserOrmEntity } from '../modules/user/infrastraucture/persistence/user-orm.entity';
 import { ResourceOrmEntity } from '../modules/resource/infrastraucture/persistence/resource-orm.entity';
+import { BookingHistoryOrmEntity } from '../modules/booking/infrastraucture/persistence/booking-history-orm.entity';
 
 @Global() // so you don't need to import it everywhere
 @Module({
@@ -21,7 +22,7 @@ import { ResourceOrmEntity } from '../modules/resource/infrastraucture/persisten
         autoLoadEntities: false,
         migrations: ['dist/migrations/*.js'],
         synchronize: false, // true only for quick demos, off in prod
-        entities:[BookingOrmEntity, UserOrmEntity, ResourceOrmEntity],
+        entities:[BookingOrmEntity, UserOrmEntity, ResourceOrmEntity,BookingHistoryOrmEntity],
       }),
     }),
   ],

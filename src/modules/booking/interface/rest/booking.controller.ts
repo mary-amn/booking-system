@@ -16,8 +16,6 @@ import { CancelBookingCommand } from '../../application/commands/cancel-booking.
 import { GetBookingQuery } from '../../application/queries/get-booking.query';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { Booking } from '../../domain/entities/booking.entity';
-import { Resource } from '../../../resource/domain/entities/resource.entity';
-import { ListAvailabilityQuery } from '../../application/queries/list-availability.query';
 
 @Controller('bookings')
 export class BookingController {
@@ -54,20 +52,5 @@ export class BookingController {
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<Booking | null> {
     return await this.queryBus.execute(new GetBookingQuery(Number(id)));
-  }
-
-
-  @Get()
-  async listAvailability(
-    @Query('resourceId') resourceId: string,
-    @Query('from') from: string,
-    @Query('to') to: string,
-  ):Promise<Partial<Resource[]>> {
-    if (!resourceId || !from || !to) {
-      return [];
-    }
-    return await this.queryBus.execute(
-      new ListAvailabilityQuery(resourceId, new Date(from), new Date(to)),
-    );
   }
 }
