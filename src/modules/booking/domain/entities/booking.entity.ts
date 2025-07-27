@@ -13,12 +13,10 @@ export class Booking {
 
   constructor(init?: Partial<Booking>) {
     Object.assign(this, init);
-    // ensure timestamps exist
     this.createdAt = this.createdAt ?? new Date();
     this.updatedAt = this.updatedAt ?? new Date();
   }
 
-  /** Factory: default status to PENDING if not provided */
   static create(
     resourceId: number,
     userId: number,
@@ -35,7 +33,6 @@ export class Booking {
     });
   }
 
-  /** Confirm only if pending */
   confirm(): void {
     if (this.status !== BookingStatus.PENDING) {
       throw new Error('Only pending bookings can be confirmed');
@@ -44,7 +41,6 @@ export class Booking {
     this.touch();
   }
 
-  /** Cancel (idempotent) */
   cancel(): void {
     if (this.status === BookingStatus.CANCELLED) {
       return;
@@ -53,12 +49,7 @@ export class Booking {
     this.touch();
   }
 
-  /** Does this booking overlap another timeslot? */
-  overlaps(other: { startsAt: Date; endsAt: Date }): boolean {
-    return this.startsAt < other.endsAt && other.startsAt < this.endsAt;
-  }
 
-  /** Update the `updatedAt` timestamp */
   private touch(): void {
     this.updatedAt = new Date();
   }

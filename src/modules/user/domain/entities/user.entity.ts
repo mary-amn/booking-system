@@ -17,9 +17,4 @@ export class User {
       name: name,
     });
   }
-
-
-  private touch() {
-    this.updatedAt = new Date();
-  }
 }

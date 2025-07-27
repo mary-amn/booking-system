@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserOrmEntity } from '../persistence/user-orm.entity';
 import { User } from '../../domain/entities/user.entity';
+import { Booking } from '../../../booking/domain/entities/booking.entity';
 
 // (Optional) Define an interface in domain:
 // export interface IUserRepository { save(u: User): Promise<void>; findById(id: string): Promise<User|null>; findByEmail(email: string): Promise<User|null>; }
@@ -15,7 +16,14 @@ export class UserRepository {
   ) {}
 
   private toDomain(orm: UserOrmEntity): User {
-    return User.create(orm.email, orm.name);
+    const user = new User({
+      id: orm.id,
+      name: orm.name,
+      email: orm.email,
+      createdAt: orm.createdAt,
+      updatedAt: orm.updatedAt,
+    });
+    return user;
   }
 
   private toOrm(user: User): UserOrmEntity {
@@ -28,9 +36,10 @@ export class UserRepository {
     return orm;
   }
 
-  async save(user: User): Promise<void> {
+  async save(user: User): Promise<number> {
     const orm = this.toOrm(user);
     await this.repo.save(orm);
+    return orm.id;
   }
 
   async findById(id: number): Promise<User | null> {

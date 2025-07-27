@@ -6,7 +6,7 @@ export interface ResourceReader {
 }
 
 export interface ResourceWriter {
-  save(resource: Resource): Promise<void>;
+  save(resource: Resource): Promise<number>;
 }
 
 export interface IResourceRepository extends ResourceReader, ResourceWriter {}

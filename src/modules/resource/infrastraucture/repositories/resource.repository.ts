@@ -38,9 +38,10 @@ export class ResourceRepository implements IResourceRepository {
     return orm;
   }
 
-  async save(resource: Resource): Promise<void> {
+  async save(resource: Resource): Promise<number> {
     const orm = this.toOrm(resource);
     await this.repo.save(orm);
+    return orm.id;
   }
 
   async findById(id: number): Promise<Resource> {

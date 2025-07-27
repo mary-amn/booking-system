@@ -14,17 +14,13 @@ export class BookingHistoryRepository implements IBookingHistoryRepository {
     private readonly historyOrmRepository: Repository<BookingHistoryOrmEntity>,
   ) {}
 
-  /**
-   * Saves a new history record to the database.
-   */
+
   async save(history: BookingHistory): Promise<void> {
     const historyRecord = this.historyOrmRepository.create(history);
     await this.historyOrmRepository.save(historyRecord);
   }
 
-  /**
-   * Finds all history records for a given bookingId.
-   */
+
   async findByBookingId(bookingId: number): Promise<BookingHistory[]> {
     return this.historyOrmRepository.find({
       where: { bookingId },
