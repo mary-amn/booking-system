@@ -1,4 +1,3 @@
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { GetBookingHandler } from './get-booking.handler';
@@ -14,7 +13,6 @@ const mockBookingRepository = {
 describe('GetBookingHandler', () => {
   let handler: GetBookingHandler;
   let bookingRepository: BookingRepository;
-
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -53,7 +51,6 @@ describe('GetBookingHandler', () => {
       mockBookingRepository.findById.mockResolvedValue(mockBooking);
 
       const result = await handler.execute(query);
-
 
       expect(mockBookingRepository.findById).toHaveBeenCalledWith(bookingId);
 

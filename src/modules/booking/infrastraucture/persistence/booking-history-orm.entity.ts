@@ -23,7 +23,6 @@ export class BookingHistoryOrmEntity {
   @CreateDateColumn()
   timestamp: Date;
 
-  // A JSON column to store relevant data at the time of the event
   @Column({ type: 'jsonb', nullable: true })
   details: Record<string, any>;
 }

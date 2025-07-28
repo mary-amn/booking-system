@@ -1,4 +1,4 @@
-import {BookingStatus} from "../../../infrastraucture/booking-status.enum";
+import { BookingStatus } from '../../../infrastraucture/booking-status.enum';
 
 export class BookingHistoryEvent {
   constructor(

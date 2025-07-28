@@ -1,4 +1,3 @@
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { GetAvailableResourcesQuery } from '../queries/get-available-resource.query';
 import { Resource } from '../../domain/entities/resource.entity';

@@ -18,19 +18,15 @@ export class GetAvailableResourcesHandler
   async execute(query: GetAvailableResourcesQuery) {
     const { startTime, endTime } = query;
 
-    // 1. Find all bookings that overlap with the desired time slot.
     const overlappingBookings =
       await this.bookingRepository.findOverlappingBookings(startTime, endTime);
 
-    // 2. Get the IDs of the resources that are already booked.
     const unavailableResourceIds = overlappingBookings.map(
       (booking) => booking.resourceId,
     );
 
-    // 3. Get all resources.
     const allResources = await this.resourceRepository.listAll();
 
-    // 4. Filter out the unavailable resources.
     const availableResources = allResources.filter(
       (resource) => !unavailableResourceIds.find((x) => x === resource.id),
     );

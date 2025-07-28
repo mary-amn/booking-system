@@ -18,6 +18,10 @@ const mockEventBus = {
   publish: jest.fn(),
 };
 
+const mockEntityManager = {
+  query: jest.fn(),
+} as unknown as EntityManager;
+
 const mockDataSource = {
   transaction: jest.fn(),
 };
@@ -26,14 +30,13 @@ describe('CreateBookingHandler', () => {
   let handler: CreateBookingHandler;
   let bookingRepository: IBookingRepository;
   let eventBus: EventBus;
-  let dataSource: DataSource;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CreateBookingHandler,
         {
-          provide: 'IBookingRepository', // Use the string token for the interface
+          provide: 'IBookingRepository',
           useValue: mockBookingRepository,
         },
         {
@@ -50,7 +53,6 @@ describe('CreateBookingHandler', () => {
     handler = module.get<CreateBookingHandler>(CreateBookingHandler);
     bookingRepository = module.get<IBookingRepository>('IBookingRepository');
     eventBus = module.get<EventBus>(EventBus);
-    dataSource = module.get<DataSource>(DataSource);
 
     jest.clearAllMocks();
   });
@@ -63,42 +65,67 @@ describe('CreateBookingHandler', () => {
       new Date('2025-08-01T11:00:00Z'),
     );
 
-    it('should create a booking, publish an event, and return the new ID when no conflicts exist', async () => {
+    it('should create a booking, publish an event after the transaction, and return the new ID', async () => {
+      // Arrange:
       const savedBookingId = 123;
+      const bookingHistoryEvent = new BookingHistoryEvent(
+        savedBookingId,
+        command.resourceId,
+        command.userId,
+        expect.any(String),
+      );
+
       mockBookingRepository.findConflictingBookingsWithLock.mockResolvedValue([]);
       mockBookingRepository.save.mockResolvedValue(savedBookingId);
 
-
       mockDataSource.transaction.mockImplementation(async (callback) => {
-        return await callback({} as EntityManager); // The manager can be an empty object for this test
+
+        return await callback(mockEntityManager);
       });
 
       const result = await handler.execute(command);
 
+
       expect(result).toEqual(savedBookingId);
-      expect(
-        mockBookingRepository.findConflictingBookingsWithLock,
-      ).toHaveBeenCalledTimes(1);
+
+      expect(mockDataSource.transaction).toHaveBeenCalledTimes(1);
+
+      expect(mockEntityManager.query).toHaveBeenCalledWith(
+        'SELECT * FROM "resources" WHERE "id" = $1 FOR UPDATE',
+        [command.resourceId],
+      );
+
+      // Check that the save method was called
       expect(mockBookingRepository.save).toHaveBeenCalledTimes(1);
+
+      // Check that the event was published AFTER the transaction
+      expect(mockEventBus.publish).toHaveBeenCalledTimes(1);
       expect(mockEventBus.publish).toHaveBeenCalledWith(
-        expect.any(BookingHistoryEvent),
+        expect.objectContaining({
+          bookingId: savedBookingId,
+        }),
       );
     });
 
-    it('should throw a ConflictException if conflicting bookings are found', async () => {
-
+    it('should throw a ConflictException and not publish an event if conflicts are found', async () => {
+      // Arrange:
+      // Mock the repository to find an existing booking
       mockBookingRepository.findConflictingBookingsWithLock.mockResolvedValue([
         new Booking({
+          /* mock booking data */
         }),
       ]);
 
+      // Mock the transaction wrapper as before
       mockDataSource.transaction.mockImplementation(async (callback) => {
-        return await callback({} as EntityManager);
+        return await callback(mockEntityManager);
       });
 
-
+      // Act & Assert:
+      // Expect the handler to reject with a ConflictException
       await expect(handler.execute(command)).rejects.toThrow(ConflictException);
 
+      // Verify that no booking was saved and no event was published
       expect(mockBookingRepository.save).not.toHaveBeenCalled();
       expect(mockEventBus.publish).not.toHaveBeenCalled();
     });

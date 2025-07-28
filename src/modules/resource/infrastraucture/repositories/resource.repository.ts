@@ -4,8 +4,6 @@ import { Repository } from 'typeorm';
 import { Resource } from '../../domain/entities/resource.entity';
 import { ResourceOrmEntity } from '../persistence/resource-orm.entity';
 import { IResourceRepository } from '../../domain/repositories/resource.repository.interface';
-import { BookingOrmEntity } from '../../../booking/infrastraucture/persistence/booking-orm.entity';
-import { Booking } from '../../../booking/domain/entities/booking.entity';
 
 @Injectable()
 export class ResourceRepository implements IResourceRepository {
@@ -13,7 +11,6 @@ export class ResourceRepository implements IResourceRepository {
     @InjectRepository(ResourceOrmEntity)
     private readonly repo: Repository<ResourceOrmEntity>,
   ) {}
-
 
   private toDomain(orm: ResourceOrmEntity): Resource {
     const resource = new Resource({

@@ -7,7 +7,6 @@ import { BookingStatus } from '../booking-status.enum';
 import { BookingOrmEntity } from '../persistence/booking-orm.entity';
 
 describe('BookingRepository (Integration with PostgreSQL)', () => {
-  // Set a longer timeout for this suite as DB connections can be slow.
   jest.setTimeout(30000);
 
   let bookingRepository: BookingRepository;
@@ -26,7 +25,6 @@ describe('BookingRepository (Integration with PostgreSQL)', () => {
     BookingStatus.CONFIRMED,
   );
 
-  // 1. SETUP: Connect to the PostgreSQL test database before any tests run.
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
@@ -49,13 +47,11 @@ describe('BookingRepository (Integration with PostgreSQL)', () => {
     dataSource = module.get<DataSource>(DataSource);
   });
 
-  // 2. CLEANUP: Clear the table and re-seed it before each test.
   beforeEach(async () => {
     await dataSource.getRepository(BookingOrmEntity).clear();
     testBookingId = await bookingRepository.save(bookingToSave);
   });
 
-  // 3. TEARDOWN: Close the database connection when all tests are finished.
   afterAll(async () => {
     await dataSource.destroy();
   });
@@ -132,12 +128,10 @@ describe('BookingRepository (Integration with PostgreSQL)', () => {
     });
 
     it('should not find a booking that has been cancelled', async () => {
-      // First, cancel the existing booking
       const booking = await bookingRepository.findById(testBookingId);
       booking!.status = BookingStatus.CANCELLED;
       await bookingRepository.save(booking!);
 
-      // Now, search for conflicts within a transaction
       await dataSource.transaction(async (transactionalEntityManager) => {
         const startTime = new Date('2025-07-29T14:30:00Z');
         const endTime = new Date('2025-07-29T15:30:00Z');
@@ -149,7 +143,6 @@ describe('BookingRepository (Integration with PostgreSQL)', () => {
           transactionalEntityManager,
         );
 
-        // The cancelled booking should not be considered a conflict
         expect(result).toHaveLength(0);
       });
     });
