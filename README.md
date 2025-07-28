@@ -1,4 +1,3 @@
-Of course. Here is the refined and well-formatted version of your `README.md`.
 
 # Booking System API
 
@@ -83,15 +82,17 @@ Once the application is running, you can access the interactive Swagger UI for A
 
 ### Race Condition Handling
 
-A potential race condition exists when two concurrent requests attempt to book the same resource simultaneously. This project solves this using **pessimistic locking at the database level**.
+A potential race condition exists when two concurrent requests attempt to book the same resource simultaneously.
 
-*   **Implementation**: Within the `CreateBookingHandler`, a transaction is initiated, and a `SELECT ... FOR UPDATE` query is placed on the `resources` table row for the specific resource being booked.
-*   **Why this approach?**: This forces any concurrent transaction trying to book the same resource to wait until the first one is complete. It's a highly reliable method that guarantees data consistency without adding external dependencies like Redis.
+*   **Implemented Solution**: This project solves the race condition using **pessimistic locking at the database level**. Within the `CreateBookingHandler`, a transaction is initiated, and a `SELECT ... FOR UPDATE` query is placed on the `resources` table row for the specific resource being booked. This forces any concurrent transaction trying to book the same resource to wait until the first one is complete, guaranteeing data consistency.
+
+*   **Alternative & Rationale**: For a system designed to scale across multiple instances (a distributed system), a more scalable approach would be to use a distributed lock with an external service like Redis. However, the database-level lock was chosen because it is a robust, self-contained solution that correctly solves the core problem without adding and managing a new dependency.
 
 ### Migration Automation
 
 *   **Current State**: Migrations are run manually via `docker compose exec app npm run migration:run`. This was a deliberate choice to ensure a stable, predictable startup process.
-*   **Future Improvement**: The next step would be to automate this by modifying the `Dockerfile`'s entrypoint to run the migration command before starting the application server (e.g., `CMD ["sh", "-c", "npm run migration:run && node dist/main"]`).
+
+*   **Future Improvement**: The next step would be to fully automate this by modifying the `Dockerfile`'s entrypoint to run the migration command before starting the application server (e.g., `CMD ["sh", "-c", "npm run migration:run && node dist/main"]`).
 
 ## 📖 API Model
 
@@ -99,67 +100,8 @@ The API provides RESTful endpoints for managing bookings.
 
 ### Main Endpoints
 
-*   **`POST /bookings`**
-    *   Creates a new booking.
-    *   **Request Body:**
-        ```json
-        {
-          "userId": "string",
-          "resourceId": "string",
-          "startsAt": "ISO8601DateString",
-          "endsAt": "ISO8601DateString"
-        }
-        ```
-    *   **Success Response (201 Created):**
-        ```json
-        {
-          "id": "string"
-        }
-        ```
-
-*   **`GET /bookings/:id`**
-    *   Retrieves a specific booking by its ID.
-    *   **Success Response (200 OK):**
-        ```json
-        {
-          "id": "string",
-          "userId": "string",
-          "resourceId": "string",
-          "startsAt": "ISO8601DateString",
-          "endsAt": "ISO8601DateString",
-          "status": "CONFIRMED" | "PENDING" | "CANCELLED"
-        }
-        ```
-
-*   **`PATCH /bookings/:id/confirm`**
-    *   Confirms a pending booking.
-    *   **Success Response (200 OK):**
-        ```json
-        {
-          "id": "string",
-          "status": "CONFIRMED"
-        }
-        ```
-
-*   **`DELETE /bookings/:id`**
-    *   Cancels a booking.
-    *   **Success Response (200 OK):**
-        ```json
-        {
-          "id": "string",
-          "status": "CANCELLED"
-        }
-        ```
-
-*   **`GET /resources/available`**
-    *   Finds available resources for a given time slot.
-    *   **Query Parameters:** `startTime`, `endTime`
-    *   **Success Response (200 OK):**
-        ```json
-        [
-          {
-            "id": "string",
-            "name": "string"
-          }
-        ]
-        ```
+*   **`POST /bookings`**: Creates a new booking.
+*   **`GET /bookings/:id`**: Retrieves a specific booking.
+*   **`PATCH /bookings/:id/confirm`**: Confirms a pending booking.
+*   **`DELETE /bookings/:id`**: Cancels a booking.
+*   **`GET /resources/available`**: Finds available resources for a given time slot.
