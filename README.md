@@ -1,35 +1,39 @@
+Of course. Here is the refined and well-formatted version of your `README.md`.
+
 # Booking System API
 
-This project is a robust RESTful API for a booking and reservation system, built with NestJs. It follows modern software architecture principles, including Domain-Driven Design (DDD) and Command Query Responsibility Segregation (CQRS), to ensure a scalable, maintainable, and testable codebase.
+This project is a robust RESTful API for a booking and reservation system, built with [NestJS](https://nestjs.com/). It follows modern software architecture principles, including Domain-Driven Design (DDD) and Command Query Responsibility Segregation (CQRS), to ensure a scalable, maintainable, and testable codebase.
 
 ## ✨ Features
 
 *   **Booking Management**: Create, confirm, cancel, and retrieve bookings.
 *   **Resource Availability**: Check for available resources within a given time slot.
+*   **Race Condition Handling**: Solved using pessimistic locking at the database level to ensure data consistency under concurrent requests.
 *   **CQRS Architecture**: Separates read and write operations for improved performance and scalability.
-*   **Domain-Driven Design**: Models the business domain accurately with entities, value objects, and repositories.
-*   **Type-Safe Database**: Uses TypeORM for reliable and type-safe database interactions.
+*   **Domain-Driven Design**: Models the business domain accurately with entities, repositories, and domain events.
+*   **Auditing**: Automatically records a history of all major booking events (Created, Confirmed, Cancelled).
 *   **API Documentation**: Automatically generated and interactive API documentation with Swagger (OpenAPI).
-*   **Validation**: Built-in request data validation using `class-validator`.
 
 ## 🛠️ Tech Stack
 
 *   **Framework**: [NestJS](https://nestjs.com/)
 *   **Language**: [TypeScript](https://www.typescriptlang.org/)
+*   **Containerization**: [Docker](https://www.docker.com/) & Docker Compose
 *   **Architecture**: DDD, CQRS (`@nestjs/cqrs`)
 *   **ORM**: [TypeORM](https://typeorm.io/)
+*   **Database**: PostgreSQL
 *   **API Specification**: Swagger (`@nestjs/swagger`)
 *   **Testing**: [Jest](https://jestjs.io/), [Supertest](https://github.com/visionmedia/supertest)
 
-## 🚀 Getting Started
+## 🚀 Getting Started with Docker (Recommended)
+
+This project is fully containerized, which is the easiest and most reliable way to run the application and its database.
 
 ### Prerequisites
 
-*   [Node.js](https://nodejs.org/en/) (v18 or higher recommended)
-*   [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
-*   A running instance of a database (e.g., PostgreSQL, MySQL).
+*   [Docker](https://www.docker.com/products/docker-desktop/) and Docker Compose must be installed and running.
 
-### Installation
+### Installation & Running
 
 1.  **Clone the repository:**
     ```bash
@@ -37,79 +41,57 @@ This project is a robust RESTful API for a booking and reservation system, built
     cd <repository-directory>
     ```
 
-2.  **Install dependencies:**
+2.  **Build and start the services:**
+    This single command will build the NestJS application image and start both the application and database containers.
     ```bash
-    npm install
+    docker compose up --build
     ```
 
-3.  **Set up environment variables:**
-    Create a `.env` file in the root directory by copying the example file:
+3.  **Run Database Migrations:**
+    The first time you start the application, or whenever there are new database changes, you need to run the migrations. Open a **new terminal window** and run:
     ```bash
-    cp .env.example .env
-    ```
-    Update the `.env` file with your database credentials and other environment-specific configurations.
-
-    ```env
-    # .env
-    DB_HOST=localhost
-    DB_PORT=5432
-    DB_USERNAME=user
-    DB_PASSWORD=password
-    DB_DATABASE=booking_db
+    docker compose exec app npm run migration:run
     ```
 
-### Running the Application
+The application is now running and available at `http://localhost:3000`.
 
-*   **Development mode:**
-    ```bash
-    npm run start:dev
-    ```
-    The application will start with hot-reloading enabled.
+## 🧪 Running Tests
 
-*   **Production mode:**
-    ```bash
-    npm run build
-    npm run start:prod
-    ```
+The project includes unit, integration, and end-to-end (E2E) tests.
 
-The server will be running on `http://localhost:3000` by default.
+### Unit Tests
 
-### Running Tests
+These tests run in isolation and do not require a database connection.
+```bash
+npm run test
+```
 
-*   **Run all unit and intigration tests:**
-    ```bash
-    npm test
-    ```
+### Integration & E2E Tests (with Docker)
 
-
-*   **Run tests with coverage:**
-    ```bash
-    npm run test:cov
-    ```
+These tests run against a dedicated, containerized test database. The command handles starting the test database, running all tests, and shutting it down.
+```bash
+npm run test:integration
+```
 
 ## 📖 API Documentation
 
 Once the application is running, you can access the interactive Swagger UI for API documentation and testing at:
 
-`http://localhost:3000/docs`
+[`http://localhost:3000/docs`](http://localhost:3000/docs)
 
-## 🏗️ Project Structure
+## 🏗️ Architectural Decisions & Future Improvements
 
-The project follows a modular structure inspired by Domain-Driven Design. Each business domain (e.g., `booking`, `user`) is a separate module.
+### Race Condition Handling
 
-```
-src
-├── modules/
-│   ├── booking/
-│   │   ├── application/    # Use cases (Commands, Queries, Handlers)
-│   │   ├── domain/         # Core business logic (Entities, Repositories, Value Objects)
-│   │   ├── infrastructure/ # Implementations (DB, external services)
-│   │   └── interface/      # API layer (Controllers, DTOs)
-│   └── ...               # Other modules (e.g., user, resource)
-├── shared/                 # Shared utilities and modules
-└── main.ts                 # Application entry point
-```
+A potential race condition exists when two concurrent requests attempt to book the same resource simultaneously. This project solves this using **pessimistic locking at the database level**.
 
+*   **Implementation**: Within the `CreateBookingHandler`, a transaction is initiated, and a `SELECT ... FOR UPDATE` query is placed on the `resources` table row for the specific resource being booked.
+*   **Why this approach?**: This forces any concurrent transaction trying to book the same resource to wait until the first one is complete. It's a highly reliable method that guarantees data consistency without adding external dependencies like Redis.
+
+### Migration Automation
+
+*   **Current State**: Migrations are run manually via `docker compose exec app npm run migration:run`. This was a deliberate choice to ensure a stable, predictable startup process.
+*   **Future Improvement**: The next step would be to automate this by modifying the `Dockerfile`'s entrypoint to run the migration command before starting the application server (e.g., `CMD ["sh", "-c", "npm run migration:run && node dist/main"]`).
 
 ## 📖 API Model
 
@@ -181,29 +163,3 @@ The API provides RESTful endpoints for managing bookings.
           }
         ]
         ```
-
-## 📊 Data Model
-
-The core of the data model is the `Booking` entity, which is managed by TypeORM.
-
-### `Booking` Entity
-
-This entity represents a reservation in the system.
-
-| Column       | Type      | Description                                  |
-| :----------- | :-------- | :------------------------------------------- |
-| `id`         | `number`  | Primary Key (bigint)                           |
-| `userId`     | `number`  | Foreign key to the `User` entity.            |
-| `resourceId` | `number`  | Foreign key to the `Resource` entity.        |
-| `startsAt`   | `Date`    | The start date and time of the booking.      |
-| `endsAt`     | `Date`    | The end date and time of the booking.        |
-| `status`     | `enum`    | The current status (`PENDING`, `CONFIRMED`). |
-| `createdAt`  | `Date`    | Timestamp of when the record was created.    |
-| `updatedAt`  | `Date`    | Timestamp of the last update.                |
-
-### Relationships
-
-*   A **Booking** belongs to one **User**.
-*   A **Booking** belongs to one **Resource**.
-*   A **User** can have many **Bookings**.
-*   A **Resource** can have many **Bookings**.
