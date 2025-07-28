@@ -110,9 +110,8 @@ export class BookingRepository implements IBookingRepository {
     endTime: Date,
     manager: EntityManager, // Use the provided manager for transaction
   ): Promise<Booking[]> {
-    // Use the provided manager to create the query, NOT this.repo
     const conflictingBookings = await manager
-      .createQueryBuilder(BookingOrmEntity, 'booking') // Pass the entity as the first argument
+      .createQueryBuilder(BookingOrmEntity, 'booking')
       .where('booking.resourceId = :resourceId', {
         resourceId: resourceId,
       })
